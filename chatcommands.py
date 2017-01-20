@@ -1,4 +1,7 @@
 from random import randint
+import async_timeout
+import urllib.parse
+import aiohttp
 import memes
 
 def roll(n, d):
@@ -27,3 +30,17 @@ def emojipasta(pasta):
         return memes.emoji[pasta]
     except KeyError:
         return memes.no
+
+async def latex_scrape(loop, equation):
+    s = urllib.parse.quote_plus(equation)
+    url = "https://chart.googleapis.com/chart?"
+    parameters = {
+        "cht":"tx", 
+        "chl": equation,
+        "chf": "bg,s,36393E",
+        "chco": "EEEEEE"
+    }
+    async with aiohttp.ClientSession(loop=loop) as session:
+        with async_timeout.timeout(10):
+            async with session.get(url, params=parameters) as resp:
+                return await resp.read()

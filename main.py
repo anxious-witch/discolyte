@@ -4,11 +4,15 @@ import discord
 import asyncio
 import secret
 import memes
+import os
 
-description = "A badly written bot"
+description = "A buggy piece of shit lazily hacked together by a magician"
 
-bot = commands.Bot(command_prefix="!", description=description)
-bad_messages = []
+bot = commands.Bot(command_prefix=commands.when_mentioned, description=description)
+client = discord.Client()
+
+meme_messages = []
+math_messages = []
 
 @bot.event
 async def on_ready():
@@ -21,13 +25,27 @@ async def hello():
     await bot.say("Hello!")
 
 @bot.command()
-async def latex():
-    await bot.say("Coming soon! :tm:")
+async def sucks():
+    await bot.say("what the fuck did you just say to me binch? :gun: :eyes:")
+
+@bot.command()
+async def latex(*equation : str):
+    """ Parses a bunch of latex markup code into an image 
+        Keep in mind that the parser is running in math mode
+        Some latex commands don't work """
+    equation = " ".join(equation)
+    if equation == "": return
+    res = await chatcommands.latex_scrape(bot.loop, equation)
+    with open("stupid_equation_thing.png", "wb") as f:
+        f.write(res)
+    math_messages.append(await bot.upload("stupid_equation_thing.png"))
+    os.remove("stupid_equation_thing.png")
 
 @bot.command()
 async def roll(dice : str):
-    """ Roll 1 - 100 (inclusive) die of 1 - 1000 (inclusive) sides
-        Returns each individual roll and the sum of the rolls """
+    """ Roll n die of d sides 
+        Returns each individual roll and the sum of the rolls 
+        n can be between 1 and 100 and d between 1 and 1000 """
     try:
         n, d = [int(x) for x in dice.split("d")]
         # I feel that this is reasonable enough for any serious dice rolls...
@@ -42,16 +60,21 @@ async def roll(dice : str):
 @bot.command()
 async def emojipasta(pasta = "random"):
     """ Responds with a emojipasta - why did I make this """
-    bad_messages.append(await bot.say(chatcommands.emojipasta(pasta)))
+    meme_messages.append(await bot.say(chatcommands.emojipasta(pasta)))
 
 @bot.command()
 async def remove(selection : str):
-    """ Deletes messages, right now it only has one case - the horrible emojipasta """
+    """ Removes messages when you feel the bot is shitting up the chat 
+        [remove meme] deletes all the emojipasta messages
+        [remove math] deletes all the LaTeX images posted """
     if selection == "meme":
-        await bot.say(bad_messages)
-        while bad_messages:
-            message = bad_messages.pop()
+        while meme_messages:
+            message = meme_messages.pop()
             await bot.delete_message(message)
-        await bot.say("Order has been restored :blush:")
+
+    if selection == "math":
+        while math_messages:
+            message = math_messages.pop()
+            await bot.delete_message(message)
 
 bot.run(secret.token)
