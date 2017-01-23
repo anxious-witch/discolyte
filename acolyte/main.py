@@ -3,7 +3,8 @@ import chatcommands
 import discord
 import asyncio
 import secret
-import memes
+import scrape
+import misc
 import os
 
 description = "A buggy piece of shit lazily hacked together by a magician"
@@ -30,22 +31,22 @@ async def sucks():
 
 @bot.command()
 async def latex(*equation : str):
-    """ Parses a bunch of latex markup code into an image 
+    """ Parses LaTeX markup into a png via Google Charts
         Keep in mind that the parser is running in math mode
-        Some latex commands don't work """
+        Use $$ $$ or \displaystyle for nicer (bigger) formulae """
     equation = " ".join(equation)
     if equation == "": return
-    res = await chatcommands.latex_scrape(bot.loop, equation)
-    with open("stupid_equation_thing.png", "wb") as f:
+    res = await scrape.latex_get(bot.loop, equation)
+    filename = misc.generate_filename()
+    with open(filename, "wb") as f:
         f.write(res)
-    math_messages.append(await bot.upload("stupid_equation_thing.png"))
-    os.remove("stupid_equation_thing.png")
+    math_messages.append(await bot.upload(filename))
+    os.remove(filename)
 
 @bot.command()
 async def roll(dice : str):
     """ Roll n die of d sides 
-        Returns each individual roll and the sum of the rolls 
-        n can be between 1 and 100 and d between 1 and 1000 """
+        Example: roll 4d6 """
     try:
         n, d = [int(x) for x in dice.split("d")]
         # I feel that this is reasonable enough for any serious dice rolls...
