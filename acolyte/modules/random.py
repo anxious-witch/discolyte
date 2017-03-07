@@ -1,6 +1,5 @@
 import discord
 from random import randint
-from datetime import datetime
 from discord.ext import commands
 
 def roll_dice(self, n, d):
