@@ -1,5 +1,5 @@
 from random import randint
-import memes
+import discord
 
 def roll(n, d):
     # Roll an n number for d sided die
@@ -19,10 +19,10 @@ def roll(n, d):
         s = "{}".format(i)
         return s
 
-def emojipasta(pasta):
-    if pasta == "random":
-        pasta = list(memes.emoji.keys())[randint(0, len(memes.emoji) - 1)]
-    try:
-        return memes.emoji[pasta]
-    except KeyError:
-        return memes.no
+def embed(tit, desc, foot, uri = None, col = discord.Colour.blue()):
+    message = discord.Embed(title=tit, description = desc, colour=col)
+    message.set_thumbnail(url="https://avatars1.githubusercontent.com/u/8780295?v=3&s=460")
+    message.set_author(name="Acolyte")
+    message.set_footer(text=foot)
+
+    return message
