@@ -3,6 +3,8 @@ A small and simple little Discord bot written in Python that utilizes the [disco
 
 Features:
  - LaTeX markup to png through the Google Charts API.
+ - Magic 8-Ball :crystal_ball: :mag: :eyes:
+ 
  
 On the horizon:
  - Compile snippets of code in various languages (check out some apis for this)
