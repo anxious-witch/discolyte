@@ -7,6 +7,7 @@ Features:
  
  
 On the horizon:
+ - PaulStretch audio via pinging the bot with an audio file
  - Compile snippets of code in various languages (check out some apis for this)
  - Naive 24-hour time zone conversion
  - Currency exchange functionality
