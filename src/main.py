@@ -2,6 +2,8 @@ from discord.ext import commands
 import discord
 import asyncio
 import secret
+import sys
+import os
 
 description = "Hi! I'm Acolyte. I'm not the smartest nor the quickest, but I do my best!"
 
