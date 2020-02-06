@@ -12,7 +12,6 @@ client = discord.Client()
 
 initial_extensions = [
     "modules.random",
-    "modules.scrape",
     "modules.chat"
 ]
 
