@@ -1,9 +1,10 @@
 from discord.ext import commands
+from dotenv import load_dotenv
 import discord
 import asyncio
-import secret
-import sys
-import os
+
+# Load the .env file
+load_dotenv()
 
 description = "Hi! I'm Acolyte. I'm not the smartest nor the quickest, but I do my best!"
 
@@ -29,4 +30,4 @@ if __name__ == "__main__":
             print("Failed to load extension!")
             print("{}: {}".format(type(oops), str(oops)))
 
-bot.run(secret.token)
+bot.run(SECRET)
