@@ -53,7 +53,7 @@ class Audio(commands.Cog):
                 ffmpeg
                     .input("pipe:", format="mp3")
                     .audio
-                    .filter("atempo", 1.1)
+                    .filter("atempo", 1.06)
                     .filter("asetrate", 44100 * 1.25)
                     .output("pipe:", format="mp3")
                     .get_args()
@@ -66,7 +66,7 @@ class Audio(commands.Cog):
             )
 
             nightcored = BytesIO(process.communicate(input=song)[0])
-            await ctx.send(file=discord.File(nightcored, "nightcore.mp3"))
+            await ctx.send("どうぞ ^_^", file=discord.File(nightcored, filename))
 
 def setup(bot):
     bot.add_cog(Audio(bot))
