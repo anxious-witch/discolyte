@@ -1,33 +1,45 @@
 from discord.ext import commands
 from dotenv import load_dotenv
+from typing import NoReturn
 import discord
+import modules
 import asyncio
+import aiohttp
+import os
 
-# Load the .env file
-load_dotenv()
+class Acolyte(commands.AutoShardedBot):
+    extensions = {
+        "modules.chat",
+        "modules.loader",
+    }
 
-description = "Hi! I'm Acolyte. I'm not the smartest nor the quickest, but I do my best!"
+    def __init__(self, token: str) -> None:
+        self.token = token
+        super().__init__(
+            command_prefix=commands.when_mentioned_or("~"),
+            description="Hi! I'm Acolyte!"
+        )
+        self.__load_extensions()
 
-bot = commands.Bot(command_prefix=commands.when_mentioned, description=description)
-client = discord.Client()
+    def __load_extensions(self) -> None:
+        print("Loading extensions...")
+        for extension in self.extensions:
+            try:
+                self.load_extension(extension)
+                print(f"Extension {extension} loaded.")
+            except (AttributeError, ImportError) as ex:
+                print(f"Failed to load module {extension}!")
+                print(str(ex))
 
-initial_extensions = [
-    "modules.random",
-    "modules.chat"
-]
 
-@bot.event
-async def on_ready():
-    print("Logged in!")
-    print("Username: " + bot.user.name)
-    print("User ID:  " + bot.user.id)
+    async def on_ready(self) -> None:
+        print("Acolyte ready!")
+
+    def run(self) -> None:
+        super().run(self.token)
 
 if __name__ == "__main__":
-    for extension in initial_extensions:
-        try:
-            bot.load_extension(extension)
-        except (AttributeError, ImportError) as oops:
-            print("Failed to load extension!")
-            print("{}: {}".format(type(oops), str(oops)))
+    load_dotenv()
+    acolyte = Acolyte(os.getenv("BOT_TOKEN"))
 
-bot.run(SECRET)
+    acolyte.run()
