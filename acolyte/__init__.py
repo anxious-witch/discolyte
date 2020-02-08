@@ -1,8 +1,11 @@
-from discord.ext import commands
+import os
 import discord
 import asyncio
 import aiohttp
-import os
+from pathlib import Path
+from discord.ext import commands
+from watchdog.observers import Observer
+from acolyte.util.watchdog import FileHandler
 
 class Acolyte(commands.AutoShardedBot):
     extensions = {
@@ -11,7 +14,7 @@ class Acolyte(commands.AutoShardedBot):
         "acolyte.modules.audio",
     }
 
-    def __init__(self, token: str) -> None:
+    def __init__(self, token: str, watch_files=False) -> None:
         super().__init__(
             command_prefix=commands.when_mentioned_or("~"),
             description="Hi! I'm Acolyte!"
@@ -22,6 +25,15 @@ class Acolyte(commands.AutoShardedBot):
             loop=self.loop,
             connector=aiohttp.TCPConnector(verify_ssl=True)
         )
+
+        if watch_files:
+            # Start the file observer
+            self.observer = Observer()
+            path = str(Path("./acolyte/modules"))
+            handler = FileHandler(self)
+
+            self.observer.schedule(handler, path)
+            self.observer.start()
 
         self.__load_extensions()
 
@@ -35,10 +47,18 @@ class Acolyte(commands.AutoShardedBot):
                 print(f"Failed to load module {extension}!")
                 print(str(ex))
 
+    """ Fired after watchdog detects a file change """
+    def reload_extension(self, extension_name) -> None:
+        extension = f"acolyte.modules.{extension_name}"
+
+        if extension in self.extensions:
+            self.unload_extension(extension)
+            self.load_extension(extension)
+            print(f"Extension {extension} reloaded.")
 
     """ Fired when the bot is resdy for events """
     async def on_ready(self) -> None:
-        print("Acolyte ready!")
+        print("Acolyte ready!\n")
 
     """ Override the inherited class' close method to close the aiohttp session """
     async def close(self) -> None:
@@ -46,6 +66,10 @@ class Acolyte(commands.AutoShardedBot):
 
         await super().close()
         await self.session.close()
+        self.observer.stop()
+
+        # Join with the main thread for a party
+        self.observer.join()
 
     """ Run the bot """
     def run(self) -> None:

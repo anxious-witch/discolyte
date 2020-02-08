@@ -13,8 +13,8 @@ class Loader(commands.Cog):
     async def load(self, ctx, *, extension_name):
         """ Load a module """
         try:
-            self.bot.load_extension(f"modules.{extension_name}")
-            self.bot.extensions.add(f"modules.{extension_name}")
+            self.bot.load_extension(f"acolyte.modules.{extension_name}")
+            self.bot.extensions.add(f"acolyte.modules.{extension_name}")
             await ctx.send(f"Module {extension_name} loaded!!")
         except (AttributeError, ImportError):
             await ctx.send("Failed to load extension ;_;")
@@ -31,8 +31,8 @@ class Loader(commands.Cog):
             return
 
         try:
-            self.bot.unload_extension(f"modules.{extension_name}")
-            self.bot.extensions.remove(f"modules.{extension_name}")
+            self.bot.unload_extension(f"acolyte.modules.{extension_name}")
+            self.bot.extensions.remove(f"acolyte.modules.{extension_name}")
             await ctx.send(f"Module {extension_name} unloaded!! Bye!!")
         except ExtensionNotLoaded:
             await ctx.send(f"Nope! This module isn't loaded!")
