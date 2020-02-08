@@ -6,6 +6,8 @@ from io import BytesIO
 from discord.ext import commands
 from mimetypes import guess_extension
 
+from acolyte.util.http import Http
+
 class Audio(commands.Cog):
     """ Post-avant jazzcore"""
 
@@ -19,22 +21,17 @@ class Audio(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.http = Http(self.bot.session)
 
-    async def __download(self, url: str):
-        async with aiohttp.ClientSession(
-            loop=self.bot.loop,
-            connector=aiohttp.TCPConnector(verify_ssl=True)
-        ) as session:
-            async with session.head(url, timeout=10) as res:
-                if res.status == 200:
-                    extension_maybe = guess_extension(res.headers["Content-Type"])
-                    if extension_maybe not in self.file_extension_whitelist:
-                        return
-                else:
-                    return
+    async def __get_extension(self, url: str):
+        headers = await self.http.get_headers(url)
 
-            async with session.get(url, timeout=10) as res:
-                return await res.read()
+        if headers is not None:
+            extension_maybe = guess_extension(headers["Content-Type"])
+            if extension_maybe == ".oga":
+                extension_maybe == ".ogg"
+
+            return extension_maybe
 
     @commands.command()
     async def nightcore(self, ctx):
@@ -43,15 +40,21 @@ class Audio(commands.Cog):
             # Just get the first one for now
             attachment = ctx.message.attachments[0]
             filename = attachment.filename
+            url = attachment.url
 
-            song = await self.__download(attachment.url)
+            extension = await self.__get_extension(url)
+
+            if extension not in self.file_extension_whitelist:
+                return await ctx.send("That's probably not a sound file! Maybe!!")
+
+            song = await self.http.download(attachment.url)
 
             if song is None:
-                return await ctx.send("Can't nightcore that! I read it in a book!!")
+                return await ctx.send("Couldn't download the song! I think it's Discord's fault!!")
 
             stream = (
                 ffmpeg
-                    .input("pipe:", format="mp3")
+                    .input("pipe:", format=f"{extension[1::]}")
                     .audio
                     .filter("atempo", 1.06)
                     .filter("asetrate", 44100 * 1.25)
@@ -67,6 +70,9 @@ class Audio(commands.Cog):
 
             nightcored = BytesIO(process.communicate(input=song)[0])
             await ctx.send("どうぞ ^_^", file=discord.File(nightcored, filename))
+
+        else:
+            await ctx.send("You gotta upload a file!")
 
 def setup(bot):
     bot.add_cog(Audio(bot))

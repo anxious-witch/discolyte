@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "030a2b5acaf9da148aa96534ce717dd90c9e556387351fe70d0edc1167f75e62"
+            "sha256": "d0a614e05e9435c8d5a2c27d397dfbfcca0e678b333fbd2aac68ff209f399489"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,10 @@
         ]
     },
     "default": {
+        "acolyte": {
+            "editable": true,
+            "path": "."
+        },
         "aiohttp": {
             "hashes": [
                 "sha256:1e984191d1ec186881ffaed4581092ba04f7c61582a177b187d3a2f07ed9719e",
@@ -106,11 +110,11 @@
         },
         "python-dotenv": {
             "hashes": [
-                "sha256:440c7c23d53b7d352f9c94d6f70860242c2f071cf5c029dd661ccb22d64ae42b",
-                "sha256:f254bfd0c970d64ccbb6c9ebef3667ab301a71473569c991253a481f1c98dddc"
+                "sha256:8429f459fc041237d98c9ff32e1938e7e5535b5ff24388876315a098027c3a57",
+                "sha256:ca9f3debf2262170d6f46571ce4d6ca1add60bb93b69c3a29dcb3d1a00a65c93"
             ],
             "index": "pypi",
-            "version": "==0.10.5"
+            "version": "==0.11.0"
         },
         "websockets": {
             "hashes": [

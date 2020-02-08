@@ -1,24 +1,28 @@
 from discord.ext import commands
-from dotenv import load_dotenv
-from typing import NoReturn
 import discord
-import modules
 import asyncio
 import aiohttp
 import os
 
 class Acolyte(commands.AutoShardedBot):
     extensions = {
-        "modules.chat",
-        "modules.loader",
+        "acolyte.modules.chat",
+        "acolyte.modules.loader",
+        "acolyte.modules.audio",
     }
 
     def __init__(self, token: str) -> None:
-        self.token = token
         super().__init__(
             command_prefix=commands.when_mentioned_or("~"),
             description="Hi! I'm Acolyte!"
         )
+
+        self.token = token
+        self.session = aiohttp.ClientSession(
+            loop=self.loop,
+            connector=aiohttp.TCPConnector(verify_ssl=True)
+        )
+
         self.__load_extensions()
 
     def __load_extensions(self) -> None:
@@ -32,14 +36,17 @@ class Acolyte(commands.AutoShardedBot):
                 print(str(ex))
 
 
+    """ Fired when the bot is resdy for events """
     async def on_ready(self) -> None:
         print("Acolyte ready!")
 
+    """ Override the inherited class' close method to close the aiohttp session """
+    async def close(self) -> None:
+        print("Closing connections and cleaning up.")
+
+        await super().close()
+        await self.session.close()
+
+    """ Run the bot """
     def run(self) -> None:
         super().run(self.token)
-
-if __name__ == "__main__":
-    load_dotenv()
-    acolyte = Acolyte(os.getenv("BOT_TOKEN"))
-
-    acolyte.run()
