@@ -19,3 +19,11 @@ The audio module depends on ffmpeg in your PATH for some commands. Make sure it'
 
 
 The nightcore has the extra caveat that it has to have the folder `cool_anime_pics` under the assets folder, that contains COOL ANIME PICS for generating a nightcore music video. It'll probably break if there isn't one in there.
+
+
+### Hack away
+
+Most reusable methods are kept under the `./acolyte/util` folder. Acolyte is set up as a Python module, so you can import with absolute paths anywhere. E.g. `from acolyte.util.fs import Filesystem`
+
+
+Flake8 is used for PEP8 code style rules. The max line length is increased to 119 lines though.

@@ -7,7 +7,11 @@ from functools import wraps
 
 class Filesystem:
     def path_wrapper(func):
-        """ Wrap method calls in the make_path call for platform-agnostic calls """
+        """
+            Wrap method calls in the make_path call
+
+            Has the benefit of making method calls platform agnostic
+        """
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             # Change the args to a mutable data structure
@@ -49,6 +53,6 @@ class Filesystem:
         """
             Convert a path to a platform dependant path
 
-            E.g. converts /a/b/c to \a\b\c if you're on Windows
+            E.g. converts /a/b/c to \\a\\b\\c if you're on Windows
         """
         return str(Path(path))

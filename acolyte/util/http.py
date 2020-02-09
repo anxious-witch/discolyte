@@ -1,5 +1,3 @@
-import aiohttp
-
 class Http:
     def __init__(self, session):
         self.session = session

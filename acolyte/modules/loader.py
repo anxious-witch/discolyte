@@ -1,8 +1,8 @@
-import discord
 from discord.ext import commands
 from discord.ext.commands.errors import ExtensionAlreadyLoaded
 from discord.ext.commands.errors import ExtensionNotFound
 from discord.ext.commands.errors import ExtensionNotLoaded
+
 
 class Loader(commands.Cog):
     """ Module loader """
@@ -48,6 +48,7 @@ class Loader(commands.Cog):
     async def list(self, ctx):
         """ List all loaded modules """
         await ctx.send(f"Loaded modules: {self.bot.extensions}")
+
 
 def setup(bot):
     bot.add_cog(Loader(bot))

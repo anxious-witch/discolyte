@@ -1,16 +1,13 @@
 import discord
-import aiohttp
-import aiofiles
 import ffmpeg
 import subprocess
 from io import BytesIO
-from pathlib import Path
-from random import randint
 from discord.ext import commands
 from mimetypes import guess_extension
 
 from acolyte.util.http import Http
 from acolyte.util.fs import Filesystem
+
 
 class Audio(commands.Cog):
     """ Post-avant jazzcore"""
@@ -61,16 +58,12 @@ class Audio(commands.Cog):
             await self.fs.write_binary_file(path, song)
 
             audio_input = (
-                ffmpeg
-                    .input(path, format=f"{extension[1:]}")
-                    .audio
-                    .filter("atempo", 1.06)
-                    .filter("asetrate", 44100 * 1.25)
+                ffmpeg.input(path, format=f"{extension[1:]}")
+                      .audio
+                      .filter("atempo", 1.06)
+                      .filter("asetrate", 44100 * 1.25)
             )
-            video_input = (
-                ffmpeg
-                    .input(self.fs.get_random_file_path("./assets/cool_anime_pics"))
-            )
+            video_input = ffmpeg.input(self.fs.get_random_file_path("./assets/cool_anime_pics"))
 
             stream = ffmpeg.output(audio_input, video_input, "pipe:", format="webm").get_args()
             process = subprocess.Popen(
@@ -90,6 +83,7 @@ class Audio(commands.Cog):
             await ctx.send(file=discord.File(nightcored, filename))
         else:
             await ctx.send("You gotta upload a file!")
+
 
 def setup(bot):
     bot.add_cog(Audio(bot))

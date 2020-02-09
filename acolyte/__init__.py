@@ -1,11 +1,9 @@
-import os
-import discord
-import asyncio
 import aiohttp
 from pathlib import Path
 from discord.ext import commands
 from watchdog.observers import Observer
 from acolyte.util.watchdog import FileHandler
+
 
 class Acolyte(commands.AutoShardedBot):
     extensions = {
@@ -62,7 +60,7 @@ class Acolyte(commands.AutoShardedBot):
     async def on_ready(self) -> None:
         print("Acolyte ready!\n")
 
-    """ Override the inherited class' close method to close the aiohttp session """
+    """ Override the inherited class' close method to clean up """
     async def close(self) -> None:
         print("Closing connections and cleaning up.")
 

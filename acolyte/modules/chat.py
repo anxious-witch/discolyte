@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+
 
 class Chat(commands.Cog):
     """ Talk to Acolyte! """
@@ -10,6 +10,7 @@ class Chat(commands.Cog):
     async def hello(self, ctx):
         """ Say hi! """
         await ctx.send("Hello!")
+
 
 def setup(bot):
     bot.add_cog(Chat(bot))

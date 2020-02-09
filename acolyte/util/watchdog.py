@@ -3,6 +3,7 @@ from watchdog.events import FileModifiedEvent
 import os
 import time
 
+
 class FileHandler(FileSystemEventHandler):
     def __init__(self, bot):
         FileSystemEventHandler.__init__(self)
