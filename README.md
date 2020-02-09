@@ -16,3 +16,6 @@ This project uses pipenv to manage dependencies. Get pipenv with `pip install pi
 ### Extra setup
 
 The audio module depends on ffmpeg in your PATH for some commands. Make sure it's installed and in your PATH or unload the module by editing the `__main__.py` file.
+
+
+The nightcore has the extra caveat that it has to have the folder `cool_anime_pics` under the assets folder, that contains COOL ANIME PICS for generating a nightcore music video. It'll probably break if there isn't one in there.
