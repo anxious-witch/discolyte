@@ -126,5 +126,5 @@ tags
 
 # End of https://www.gitignore.io/api/vim,python
 
-assets/
+assets/cool_anime_pics/*.jpg
 .env
