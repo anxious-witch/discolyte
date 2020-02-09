@@ -51,6 +51,8 @@ class Acolyte(commands.AutoShardedBot):
     def reload_extension(self, extension_name) -> None:
         extension = f"acolyte.modules.{extension_name}"
 
+        # There's something quirky going on with reload_extension
+        # So I unload and then load it again instead...
         if extension in self.extensions:
             self.unload_extension(extension)
             self.load_extension(extension)

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1ae521be810d762fabc7f698fc6b3c229bedf12edf0b43271718846062909e4c"
+            "sha256": "c4f0f86674d97bc2daf24ddf652c835e5c40349b6b4cc65a964d6b41715604af"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -19,6 +19,14 @@
         "acolyte": {
             "editable": true,
             "path": "."
+        },
+        "aiofiles": {
+            "hashes": [
+                "sha256:021ea0ba314a86027c166ecc4b4c07f2d40fc0f4b3a950d1868a0f2571c2bbee",
+                "sha256:1e644c2573f953664368de28d2aa4c89dfd64550429d0c27c4680ccd3aa4985d"
+            ],
+            "index": "pypi",
+            "version": "==0.4.0"
         },
         "aiohttp": {
             "hashes": [
@@ -124,10 +132,10 @@
         },
         "watchdog": {
             "hashes": [
-                "sha256:d64786787b14c8c6a71a8cc014056776ba6b52e85d1164ef2ab50aec02723a3d"
+                "sha256:c560efb643faed5ef28784b2245cf8874f939569717a4a12826a173ac644456b"
             ],
             "index": "pypi",
-            "version": "==0.10.1"
+            "version": "==0.10.2"
         },
         "websockets": {
             "hashes": [
