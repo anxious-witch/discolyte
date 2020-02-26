@@ -9,6 +9,7 @@ class Loader(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.is_owner()
     @commands.command(hidden=True)
     async def load(self, ctx, *, extension_name):
         """ Load a module """
@@ -23,6 +24,7 @@ class Loader(commands.Cog):
         except ExtensionAlreadyLoaded:
             await ctx.send("WOA!! This module is already loaded!! :tada: :tada:")
 
+    @commands.is_owner()
     @commands.command(hidden=True)
     async def unload(self, ctx, *, extension_name):
         """ Unload a module """
@@ -37,6 +39,7 @@ class Loader(commands.Cog):
         except ExtensionNotLoaded:
             await ctx.send(f"Nope! This module isn't loaded!")
 
+    @commands.is_owner()
     @commands.command(hidden=True)
     async def reload(self, ctx):
         """ Reload all loaded modules """
@@ -44,6 +47,7 @@ class Loader(commands.Cog):
             self.bot.reload_extension(ext)
         await ctx.send(f"Reloaded {len(self.bot.extensions)} modules!!")
 
+    @commands.is_owner()
     @commands.command(hidden=True)
     async def list(self, ctx):
         """ List all loaded modules """
