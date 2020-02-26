@@ -15,11 +15,20 @@ class Audio(commands.Cog):
     """ Post-avant jazzcore"""
 
     file_extension_whitelist = {
-        ".mp3",
-        ".wav",
-        ".ogg",
-        ".aac",
-        ".flac",
+        "audio": {
+            ".mp3",
+            ".wav",
+            ".ogg",
+            ".aac",
+            ".flac",
+        },
+        "image": {
+            ".jpeg",
+            ".jpg",
+            ".bmp",
+            ".png",
+            ".gif"
+        }
     }
 
     def __init__(self, bot):
@@ -34,60 +43,98 @@ class Audio(commands.Cog):
             extension_maybe = guess_extension(headers["Content-Type"])
             if extension_maybe == ".oga":
                 extension_maybe = ".ogg"
+            if extension_maybe == ".jpe":
+                extension_maybe = ".jpeg"
 
             return extension_maybe
 
-    @commands.command()
+    @commands.group()
     async def nightcore(self, ctx):
+        """ Nightcore commands! """
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Invalid nightcore command!!")
+
+    @nightcore.group()
+    async def images(self, ctx):
+        """ COOL ANIME PICS commands! """
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Invalid images command!!")
+
+    @nightcore.command()
+    async def generate(self, ctx):
         """ ONE TWO SEVEN THREE DOWN TO ROCKEFELLER STREET """
-        if len(ctx.message.attachments) > 0:
-            # Just get the first one for now
-            attachment = ctx.message.attachments[0]
-            filename = ''.join(attachment.filename.split('.')[:-1])
-            url = attachment.url
+        if len(ctx.message.attachments) != 1:
+            return await ctx.send("Only one song per upload please thanks ok bye!!")
 
-            extension = await self.__get_extension(url)
+        # Just get the first one for now
+        attachment = ctx.message.attachments[0]
+        filename = ''.join(attachment.filename.split('.')[:-1])
+        url = attachment.url
 
-            if extension not in self.file_extension_whitelist:
-                return await ctx.send("That's probably not a sound file! Maybe!!")
+        extension = await self.__get_extension(url)
 
-            path = self.fs.make_path(f"./assets/{filename}")
-            song = await self.http.download(attachment.url)
+        if extension not in self.file_extension_whitelist["audio"]:
+            return await ctx.send("That's probably not a sound file! Maybe!!")
 
-            if song is None:
-                return await ctx.send("Couldn't download the song! I think it's Discord's fault!!")
+        path = self.fs.make_path(f"./assets/{filename}")
+        song = await self.http.download(attachment.url)
 
-            await self.fs.write_binary_file(path, song)
+        if song is None:
+            return await ctx.send("Couldn't download the song! I think it's Discord's fault!!")
 
-            audio_input = (
-                ffmpeg.input(path, format=f"{extension[1:]}")
-                      .audio
-                      .filter("atempo", 1.06)
-                      .filter("asetrate", 44100 * 1.25)
-            )
-            video_input = ffmpeg.input(self.fs.get_random_file_path("./assets/cool_anime_pics"))
+        await self.fs.write_binary_file(path, song)
 
-            stream = ffmpeg.output(audio_input, video_input, "pipe:", format="webm").get_args()
-            process = subprocess.Popen(
-                ["ffmpeg"] + ["-loglevel", "panic"] + stream,
-                stdout=subprocess.PIPE
-            )
+        audio_input = (
+            ffmpeg.input(path, format=f"{extension[1:]}")
+                  .audio
+                  .filter("atempo", 1.06)
+                  .filter("asetrate", 44100 * 1.25)
+        )
+        video_input = ffmpeg.input(self.fs.get_random_file_path("./assets/cool_anime_pics"))
 
-            print(f"Generating nightcore for {ctx.author}...")
+        stream = ffmpeg.output(audio_input, video_input, "pipe:", format="webm").get_args()
+        process = subprocess.Popen(
+            ["ffmpeg"] + ["-loglevel", "panic"] + stream,
+            stdout=subprocess.PIPE
+        )
 
-            nightcored = BytesIO(process.communicate(input=song)[0])
-            filename = f"Nightcore - {filename}.webm"
+        print(f"Generating nightcore for {ctx.author}...")
 
-            print("Done! Uploading...")
+        nightcored = BytesIO(process.communicate(input=song)[0])
+        filename = f"Nightcore - {filename}.webm"
 
-            self.fs.remove_file(path)
+        print("Done! Uploading...")
 
-            if nightcored.getbuffer().nbytes > UPLOAD_LIMIT_IN_BYTES:
-                await ctx.send(":police: Waoow!! The video is TOO BIG for Discord!!! :police:")
+        self.fs.remove_file(path)
 
-            await ctx.send(file=discord.File(nightcored, filename))
-        else:
-            await ctx.send("You gotta upload a file!")
+        if nightcored.getbuffer().nbytes > UPLOAD_LIMIT_IN_BYTES:
+            await ctx.send(":police: Waoow!! The video is TOO BIG for Discord!!! :police:")
+
+        await ctx.send(file=discord.File(nightcored, filename))
+
+    @images.command()
+    async def add(self, ctx):
+        """ Upload a COOL ANIME PIC """
+        if len(ctx.message.attachments) != 1:
+            return await ctx.send("Only one image per upload thanks bye!!")
+
+        attachment = ctx.message.attachments[0]
+        extension = await self.__get_extension(attachment.url)
+        image = await self.http.download(attachment.url)
+
+        if extension not in self.file_extension_whitelist["image"]:
+            return await ctx.send("Hey! That's NOT a cool anime pic!!")
+
+        filename = await self.fs.generate_filename(extension)
+        path = self.fs.make_path(f"./assets/cool_anime_pics/{filename}")
+
+        await self.fs.write_binary_file(path, image)
+        await ctx.send(f"Cool pic!! Uploaded!!!")
+
+    @images.command()
+    async def list(self, ctx):
+        ls = self.fs.get_directory_listing("./assets/cool_anime_pics")
+        await ctx.send(ls)
 
 
 def setup(bot):
