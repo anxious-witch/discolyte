@@ -8,6 +8,8 @@ from mimetypes import guess_extension
 from acolyte.util.http import Http
 from acolyte.util.fs import Filesystem
 
+UPLOAD_LIMIT_IN_BYTES = 8388119
+
 
 class Audio(commands.Cog):
     """ Post-avant jazzcore"""
@@ -41,7 +43,7 @@ class Audio(commands.Cog):
         if len(ctx.message.attachments) > 0:
             # Just get the first one for now
             attachment = ctx.message.attachments[0]
-            filename = attachment.filename
+            filename = ''.join(attachment.filename.split('.')[:-1])
             url = attachment.url
 
             extension = await self.__get_extension(url)
@@ -79,6 +81,9 @@ class Audio(commands.Cog):
             print("Done! Uploading...")
 
             self.fs.remove_file(path)
+
+            if nightcored.getbuffer().nbytes > UPLOAD_LIMIT_IN_BYTES:
+                await ctx.send(":police: Waoow!! The video is TOO BIG for Discord!!! :police:")
 
             await ctx.send(file=discord.File(nightcored, filename))
         else:
