@@ -5,9 +5,11 @@ import os
 if __name__ == "__main__":
     load_dotenv()
 
+    dev = True if os.getenv("ACOLYTE_ENV") == "development" else False
+
     acolyte = Acolyte(
-        os.getenv("BOT_TOKEN"),
-        watch_files=True
+        os.getenv("ACOLYTE_TOKEN"),
+        development=dev
     )
 
     acolyte.run()

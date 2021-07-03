@@ -12,7 +12,7 @@ class Acolyte(commands.AutoShardedBot):
         "acolyte.modules.audio",
     }
 
-    def __init__(self, token: str, watch_files=False) -> None:
+    def __init__(self, token: str, development=False) -> None:
         super().__init__(
             command_prefix=commands.when_mentioned_or("~"),
             description="Hi! I'm Acolyte!"
@@ -23,9 +23,12 @@ class Acolyte(commands.AutoShardedBot):
             loop=self.loop,
             connector=aiohttp.TCPConnector(verify_ssl=True)
         )
+        self.development = development
 
-        if watch_files:
+        if self.development:
             # Start the file observer
+            print("[DEV] Starting watchdog")
+
             self.observer = Observer()
             path = str(Path("./acolyte/modules"))
             handler = FileHandler(self)
@@ -66,10 +69,12 @@ class Acolyte(commands.AutoShardedBot):
 
         await super().close()
         await self.session.close()
-        self.observer.stop()
 
-        # Join with the main thread for a party
-        self.observer.join()
+        if self.development:
+            self.observer.stop()
+
+            # Join with the main thread for a party
+            self.observer.join()
 
     """ Run the bot """
     def run(self) -> None:
