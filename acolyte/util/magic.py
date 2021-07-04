@@ -16,6 +16,8 @@ class Magic:
         "audio/x-mpegurl": "m3u",
         "audio/x-ms-wma": "wma",
         "audio/x-wav": "wav",
+        "audio/x-m4a": "m4a",
+        "audio/x-hx-aac-adts": "aac"
     }
 
     image_extensions = {
