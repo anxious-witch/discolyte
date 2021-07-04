@@ -3,10 +3,10 @@ import ffmpeg
 import subprocess
 from io import BytesIO
 from discord.ext import commands
-from mimetypes import guess_extension
 
 from acolyte.util.http import Http
 from acolyte.util.fs import Filesystem
+from acolyte.util.magic import Magic
 
 UPLOAD_LIMIT_IN_BYTES = 8388119
 
@@ -14,39 +14,12 @@ UPLOAD_LIMIT_IN_BYTES = 8388119
 class Audio(commands.Cog):
     """ Post-avant jazzcore"""
 
-    file_extension_whitelist = {
-        "audio": {
-            ".mp3",
-            ".wav",
-            ".ogg",
-            ".aac",
-            ".flac",
-        },
-        "image": {
-            ".jpeg",
-            ".jpg",
-            ".bmp",
-            ".png",
-            ".gif"
-        }
-    }
-
     def __init__(self, bot):
         self.bot = bot
         self.http = Http(self.bot.session)
         self.fs = Filesystem()
+        self.magic = Magic()
 
-    async def __get_extension(self, url: str):
-        headers = await self.http.get_headers(url)
-
-        if headers is not None:
-            extension_maybe = guess_extension(headers["Content-Type"])
-            if extension_maybe == ".oga":
-                extension_maybe = ".ogg"
-            if extension_maybe == ".jpe":
-                extension_maybe = ".jpeg"
-
-            return extension_maybe
 
     @commands.group()
     async def nightcore(self, ctx):
@@ -69,27 +42,27 @@ class Audio(commands.Cog):
         # Just get the first one for now
         attachment = ctx.message.attachments[0]
         filename = ''.join(attachment.filename.split('.')[:-1])
-        url = attachment.url
-
-        extension = await self.__get_extension(url)
-
-        if extension not in self.file_extension_whitelist["audio"]:
-            return await ctx.send("That's probably not a sound file! Maybe!!")
 
         path = self.fs.make_path(f"./assets/{filename}")
         song = await self.http.download(attachment.url)
 
+        extension = self.magic.get_audio_extension(song[0:2048])
+
         if song is None:
             return await ctx.send("Couldn't download the song! I think it's Discord's fault!!")
+        
+        if extension is None:
+            return await ctx.send("What the HECK is this file, I don't think it's audio!!")
 
         await self.fs.write_binary_file(path, song)
 
         audio_input = (
-            ffmpeg.input(path, format=f"{extension[1:]}")
+            ffmpeg.input(path, format=extension)
                   .audio
                   .filter("atempo", 1.06)
                   .filter("asetrate", 44100 * 1.25)
         )
+
         video_input = ffmpeg.input(self.fs.get_random_file_path("./assets/cool_anime_pics"))
 
         stream = ffmpeg.output(audio_input, video_input, "pipe:", format="webm").get_args()
@@ -119,13 +92,14 @@ class Audio(commands.Cog):
             return await ctx.send("Only one image per upload thanks bye!!")
 
         attachment = ctx.message.attachments[0]
-        extension = await self.__get_extension(attachment.url)
         image = await self.http.download(attachment.url)
+        extension = self.magic.get_image_extension(image[0:2048])
 
-        if extension not in self.file_extension_whitelist["image"]:
+        if extension is None:
             return await ctx.send("Hey! That's NOT a cool anime pic!!")
 
-        filename = await self.fs.generate_filename(extension)
+        filename = await self.fs.generate_filename(f".{extension}")
+
         path = self.fs.make_path(f"./assets/cool_anime_pics/{filename}")
 
         await self.fs.write_binary_file(path, image)

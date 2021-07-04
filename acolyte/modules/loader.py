@@ -29,8 +29,7 @@ class Loader(commands.Cog):
     async def unload(self, ctx, *, extension_name):
         """ Unload a module """
         if extension_name == "loader":
-            await ctx.send("hey don't")
-            return
+            return await ctx.send("hey don't")
 
         try:
             self.bot.unload_extension(f"acolyte.modules.{extension_name}")
