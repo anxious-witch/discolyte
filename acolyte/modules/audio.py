@@ -46,7 +46,7 @@ class Audio(commands.Cog):
         path = self.fs.make_path(f"./assets/{filename}")
         song = await self.http.download(attachment.url)
 
-        extension = self.magic.get_audio_extension(song[0:2048])
+        extension = self.magic.get_audio_extension(song)
 
         if song is None:
             return await ctx.send("Couldn't download the song! I think it's Discord's fault!!")
@@ -93,7 +93,7 @@ class Audio(commands.Cog):
 
         attachment = ctx.message.attachments[0]
         image = await self.http.download(attachment.url)
-        extension = self.magic.get_image_extension(image[0:2048])
+        extension = self.magic.get_image_extension(image)
 
         if extension is None:
             return await ctx.send("Hey! That's NOT a cool anime pic!!")
