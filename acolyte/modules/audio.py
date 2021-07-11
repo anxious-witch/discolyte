@@ -36,16 +36,17 @@ class Audio(commands.Cog):
     @nightcore.command()
     async def generate(self, ctx):
         """ ONE TWO SEVEN THREE DOWN TO ROCKEFELLER STREET """
-        if len(ctx.message.attachments) != 1:
-            return await ctx.send("Only one song per upload please thanks ok bye!!")
+        message = ctx.message
+
+        if len(message.attachments) < 1:
+            return await ctx.send("Hey I need a song!!")
 
         # Just get the first one for now
-        attachment = ctx.message.attachments[0]
+        attachment = message.attachments[0]
         filename = ''.join(attachment.filename.split('.')[:-1])
 
         path = self.fs.make_path(f"./assets/{filename}")
         song = await self.http.download(attachment.url)
-
         extension = self.magic.get_audio_extension(song)
 
         if song is None:
@@ -54,6 +55,7 @@ class Audio(commands.Cog):
         if extension is None:
             return await ctx.send("What the HECK is this file, I don't think it's audio!!")
 
+        await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
         await self.fs.write_binary_file(path, song)
 
         audio_input = (
