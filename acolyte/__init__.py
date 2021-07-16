@@ -9,7 +9,7 @@ class Acolyte(commands.AutoShardedBot):
     extensions = {
         "acolyte.modules.chat",
         "acolyte.modules.loader",
-        "acolyte.modules.audio",
+        "acolyte.modules.nightcore",
     }
 
     def __init__(self, token: str, development=False) -> None:

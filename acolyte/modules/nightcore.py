@@ -11,7 +11,7 @@ from acolyte.util.magic import Magic
 UPLOAD_LIMIT_IN_BYTES = 8388119
 
 
-class Audio(commands.Cog):
+class Nightcore(commands.Cog):
     """ Post-avant jazzcore"""
 
     def __init__(self, bot):
@@ -43,7 +43,9 @@ class Audio(commands.Cog):
 
         # Just get the first one for now
         attachment = message.attachments[0]
-        filename = ''.join(attachment.filename.split('.')[:-1])
+
+        filename = attachment.filename.split('.')[0]
+        original_extension = attachment.filename.split('.')[-1]
 
         path = self.fs.make_path(f"./assets/{filename}")
         song = await self.http.download(attachment.url)
@@ -52,10 +54,17 @@ class Audio(commands.Cog):
         if song is None:
             return await ctx.send("Couldn't download the song! I think it's Discord's fault!!")
         
-        if extension is None:
-            return await ctx.send("What the HECK is this file, I don't think it's audio!!")
+        if extension is None and filename == original_extension:
+            return await ctx.send(
+                "What the HECK is this, I don't think this is an audio file??? listen i might be wrong about this"
+            )
+        elif extension is None:
+            # Just try to generate it with the original extension, it might work!
+            extension = original_extension
+            await message.add_reaction('\N{BLACK QUESTION MARK ORNAMENT}')
+        else:
+            await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
 
-        await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
         await self.fs.write_binary_file(path, song)
 
         audio_input = (
@@ -83,7 +92,7 @@ class Audio(commands.Cog):
         self.fs.remove_file(path)
 
         if nightcored.getbuffer().nbytes > UPLOAD_LIMIT_IN_BYTES:
-            await ctx.send(":police: Waoow!! The video is TOO BIG for Discord!!! :police:")
+            await ctx.send(":police_car: Waoow!! The video is TOO BIG for Discord!!! :police_car:")
 
         await ctx.send(file=discord.File(nightcored, filename))
 
@@ -114,4 +123,4 @@ class Audio(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Audio(bot))
+    bot.add_cog(Nightcore(bot))
