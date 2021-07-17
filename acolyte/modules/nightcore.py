@@ -43,32 +43,23 @@ class Nightcore(commands.Cog):
 
         # Just get the first one for now
         attachment = message.attachments[0]
-
         filename = attachment.filename.split('.')[0]
-        original_extension = attachment.filename.split('.')[-1]
-
         path = self.fs.make_path(f"./assets/{filename}")
         song = await self.http.download(attachment.url)
-        extension = self.magic.get_audio_extension(song)
 
         if song is None:
             return await ctx.send("Couldn't download the song! I think it's Discord's fault!!")
-        
-        if extension is None and filename == original_extension:
+
+        if not self.magic.has_audio_track(song):
             return await ctx.send(
                 "What the HECK is this, I don't think this is an audio file??? listen i might be wrong about this"
             )
-        elif extension is None:
-            # Just try to generate it with the original extension, it might work!
-            extension = original_extension
-            await message.add_reaction('\N{BLACK QUESTION MARK ORNAMENT}')
-        else:
-            await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
 
+        await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
         await self.fs.write_binary_file(path, song)
 
         audio_input = (
-            ffmpeg.input(path, format=extension)
+            ffmpeg.input(path)
                   .audio
                   .filter("atempo", 1.06)
                   .filter("asetrate", 44100 * 1.25)
